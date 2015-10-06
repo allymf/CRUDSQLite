@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">CRUDSQLite</string>
+
+    <!-- MainActivity -->
+
+        <!-- TextView -->
+            <string name="tvID">ID:</string>
+            <string name="tvName">Name:</string>
+            <string name="tvPhone">Phone:</string>
+            <string name="tvAddress">Address:</string>
+
+        <!-- Button -->
+            <string name="btPrevious">Previous</string>
+            <string name="btNext">Next</string>
+
+            <string name="btCreate">New</string>
+            <string name="btRead">Search</string>
+            <string name="btUpdate">Update</string>
+            <string name="btDelete">Delete</string>
+
+            <string name="btSave">Save</string>
+    
+    <string name="action_settings">Settings</string>
+</resources>

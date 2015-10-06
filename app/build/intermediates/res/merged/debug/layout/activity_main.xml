@@ -1,0 +1,126 @@
+
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:orientation="vertical"
+        android:elevation="1dp">
+
+    <TextView android:text="@string/tvID" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        />
+
+    <TextView android:text="@string/tvName" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:lines="1"
+        />
+
+    <TextView android:text="@string/tvPhone" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        />
+
+    <TextView android:text="@string/tvAddress" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/etAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPostalAddress"
+        />
+
+    <LinearLayout
+        android:id="@+id/llPrevNext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        >
+
+        <Button
+            android:id="@+id/btPrevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btPrevious"
+            />
+
+        <Button
+            android:id="@+id/btNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btNext"
+            />
+
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Grupo de Botoes Provisorios -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <Button
+            android:id="@+id/btCreate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btCreate"
+            />
+
+        <Button
+            android:id="@+id/btRead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btRead"
+            />
+
+        <Button
+            android:id="@+id/btUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btUpdate"
+            />
+
+        <Button
+            android:id="@+id/btDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btDelete"
+            />
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>
+
+
+
+<!-- From: file:/C:/Users/Alysson/Desktop/CRUDSQLite/app/src/main/res/layout/activity_main.xml -->
