@@ -1,6 +1,7 @@
 package br.alysson.crudsqlite;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.SQLException;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     EditText etID,etName,etPhone,etAddress;
     Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext;
 
+    String id, name, phone, address;
 
     boolean creating = false;
     boolean reading = false;
@@ -82,17 +84,28 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(!updating){
+                if(!reading){
+                    llPrevNext.setVisibility(View.GONE);
                     toggleEnableButtons(false);
                     btRead.setEnabled(true);
 
-                    toggleEnableEditTexts(true);
+                    toggleEnableEditTexts(false);
+                    etName.setEnabled(true);
                     clear();
-                }else{
 
+                    reading=true;
+                }else {
+                    name = etName.getText().toString();
+                    String search = "name LIKE ?";
+                    read(search,new String[]{"%"+name+"%"});
+
+                    toggleEnableButtons(true);
+
+                    reading = false;
                 }
 
-            }
+
+                }
         });
 
         btUpdate.setOnClickListener(new View.OnClickListener() {
@@ -133,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                         "name TEXT,phone TEXT, " +
                         "address TEXT);";
             sqliteDatabase.execSQL(sql);
-            read(null);
+            read(null,null);
 
         }catch(SQLException e){
             Toast.makeText(MainActivity.this,"Erro com banco de dados",Toast.LENGTH_LONG).show();
@@ -142,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void create(){
-        String name, phone, address;
+
         name = etName.getText().toString();
         phone = etPhone.getText().toString();
         address = etAddress.getText().toString();
@@ -171,15 +184,17 @@ public class MainActivity extends AppCompatActivity {
             if(!name.equals("") && !phone.equals("") && !address.equals("")) {
                 try {
 
-
-                    String sql = "INSERT INTO people (name,phone,address) VALUES( '" + name + "', '" + phone + "', '" + address + "' );";
-                    sqliteDatabase.execSQL(sql);
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put("name",name);
+                    contentValues.put("phone",phone);
+                    contentValues.put("address",address);
+                    sqliteDatabase.insert("people",null,contentValues);
 
                     clear();
                     toggleEnableButtons(true);
                     btCreate.setText(getString(R.string.btCreate));
 
-                    read(null);
+                    read(null,null);
                     creating = false;
 
 
@@ -198,26 +213,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private boolean read(@Nullable String selection){
+    private boolean read(@Nullable String selection,@Nullable String[] selectionArgs){
         etID.setEnabled(false);
 
         try{
-            cursor = sqliteDatabase.query("people", null,selection,null,null,null,null,null);
-
+            cursor = sqliteDatabase.query("people", null,selection,selectionArgs,null,null,null,null);
             if(cursor.getCount()>0){
-                if(creating || updating){
+                if(creating){
                     cursor.moveToLast();
                     btNext.setEnabled(false);
-                    btPrevious.setEnabled(true);
+                    btPrevious.setEnabled(!cursor.isFirst());
                 }else{
                     cursor.moveToFirst();
-                    btNext.setEnabled(true);
+                    btNext.setEnabled(!cursor.isLast());
                     btPrevious.setEnabled(false);
                 }
                 displayData();
                 llPrevNext.setVisibility(View.VISIBLE);
                 return true;
             }else{
+                Toast.makeText(MainActivity.this, "Nenhum registro semelhante", Toast.LENGTH_SHORT).show();
                 return false;
             }
 
@@ -232,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean update(){
         final String id = etID.getText().toString();
-        String name, phone, address;
         name = etName.getText().toString();
         phone = etPhone.getText().toString();
         address = etAddress.getText().toString();
@@ -248,12 +262,15 @@ public class MainActivity extends AppCompatActivity {
 
         }else if(!etID.isEnabled() && !id.equals("") && updating && !name.equals("") && !phone.equals("") && !address.equals("")){
             try {
-                String sql = "UPDATE people SET name='"+name+"', phone='"+phone+"', address='"+address+"' WHERE id = "+id+";";
-                sqliteDatabase.execSQL(sql);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("name",name);
+                contentValues.put("phone",phone);
+                contentValues.put("address",address);
+                sqliteDatabase.update("people",contentValues,"id = ?",new String[]{id});
 
                 toggleEnableEditTexts(false);
                 toggleEnableButtons(true);
-                read(null);
+                read(null, null);
                 llPrevNext.setVisibility(View.VISIBLE);
                 updating = false;
 
@@ -285,8 +302,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     try {
-                        sqliteDatabase.delete("people", "id = " + id, null);
-                        read(null);
+                        sqliteDatabase.delete("people","id = ?",new String[]{id});
+                        read(null,null);
                     } catch (SQLException e) {
                         Toast.makeText(MainActivity.this, "Erro ao excluir registro", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Erro ao excluir do banco: " + e.getMessage());
