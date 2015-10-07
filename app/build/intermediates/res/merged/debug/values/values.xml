@@ -212,6 +212,7 @@
     <eat-comment/>
     <string name="action_settings">Settings</string>
     <string name="app_name">CRUDSQLite</string>
+    <string name="btCancel">Cancel</string>
     <string name="btCreate">New</string>
     <string name="btDelete">Delete</string>
     <string name="btNext">Next</string>

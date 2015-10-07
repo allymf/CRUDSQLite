@@ -19,6 +19,7 @@
             <string name="btDelete">Delete</string>
 
             <string name="btSave">Save</string>
+            <string name="btCancel">Cancel</string>
     
     <string name="action_settings">Settings</string>
 </resources>

@@ -8,8 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,19 +15,25 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
     SQLiteDatabase sqliteDatabase = null;
     Cursor cursor;
-    final String databaseName = "CRUD";
+    final String DATABASENAME = "CRUD";
+
+    final String TABLENAME = "people";
+
+    final String COLLUM_ID = "id";
+    final String COLLUM_NAME = "name";
+    final String COLLUM_PHONE = "phone";
+    final String COLLUM_ADDRESS = "address";
 
     private static final String TAG = "CRUDSQLite";
 
     LinearLayout llPrevNext;
     EditText etID,etName,etPhone,etAddress;
-    Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext;
+    Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext,btCancel;
 
     String id, name, phone, address;
 
@@ -55,8 +59,10 @@ public class MainActivity extends AppCompatActivity {
         btRead     = (Button) findViewById(R.id.btRead);
         btUpdate   = (Button) findViewById(R.id.btUpdate);
         btDelete   = (Button) findViewById(R.id.btDelete);
+        btCancel   = (Button) findViewById(R.id.btCancel);
 
         etName.requestFocus();
+
 
         btPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,8 +92,8 @@ public class MainActivity extends AppCompatActivity {
 
                 if(!reading){
                     llPrevNext.setVisibility(View.GONE);
-                    toggleEnableButtons(false);
-                    btRead.setEnabled(true);
+                    toggleEnableButtons(View.GONE);
+                    btRead.setVisibility(View.VISIBLE);
 
                     toggleEnableEditTexts(false);
                     etName.setEnabled(true);
@@ -99,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     String search = "name LIKE ?";
                     read(search,new String[]{"%"+name+"%"});
 
-                    toggleEnableButtons(true);
+                    toggleEnableButtons(View.VISIBLE);
 
                     reading = false;
                 }
@@ -122,6 +128,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        btCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                creating = false;
+                reading = false;
+                updating = false;
+
+                toggleEnableButtons(View.VISIBLE);
+
+                read(null,null);
+            }
+        });
+
         openOrCreateDatabase();
 
     }
@@ -140,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void openOrCreateDatabase(){
         try{
-            sqliteDatabase = openOrCreateDatabase(databaseName,MODE_PRIVATE,null);
+            sqliteDatabase = openOrCreateDatabase(DATABASENAME,MODE_PRIVATE,null);
             String sql = "CREATE TABLE IF NOT EXISTS people " +
                         "( id INTEGER PRIMARY KEY," +
                         "name TEXT,phone TEXT, " +
@@ -174,8 +194,8 @@ public class MainActivity extends AppCompatActivity {
             etID.setEnabled(false);
             etName.requestFocus();
 
-            toggleEnableButtons(false);
-            btCreate.setEnabled(true);
+            toggleEnableButtons(View.GONE);
+            btCreate.setVisibility(View.VISIBLE);
             btCreate.setText(getString(R.string.btSave));
 
             creating = true;
@@ -185,13 +205,13 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     ContentValues contentValues = new ContentValues();
-                    contentValues.put("name",name);
-                    contentValues.put("phone",phone);
-                    contentValues.put("address",address);
-                    sqliteDatabase.insert("people",null,contentValues);
+                    contentValues.put(COLLUM_NAME,name);
+                    contentValues.put(COLLUM_PHONE,phone);
+                    contentValues.put(COLLUM_ADDRESS,address);
+                    sqliteDatabase.insert(TABLENAME,null,contentValues);
 
                     clear();
-                    toggleEnableButtons(true);
+                    toggleEnableButtons(View.VISIBLE);
                     btCreate.setText(getString(R.string.btCreate));
 
                     read(null,null);
@@ -206,6 +226,8 @@ public class MainActivity extends AppCompatActivity {
 
             }else{
                 Toast.makeText(MainActivity.this, "Prencha todos os campos", Toast.LENGTH_SHORT).show();
+                creating = false;
+                read(null,null);
             }
 
 
@@ -217,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         etID.setEnabled(false);
 
         try{
-            cursor = sqliteDatabase.query("people", null,selection,selectionArgs,null,null,null,null);
+            cursor = sqliteDatabase.query(TABLENAME, null,selection,selectionArgs,null,null,null,null);
             if(cursor.getCount()>0){
                 if(creating){
                     cursor.moveToLast();
@@ -255,21 +277,23 @@ public class MainActivity extends AppCompatActivity {
             updating = true;
 
             llPrevNext.setVisibility(View.GONE);
-            toggleEnableButtons(false);
-            btUpdate.setEnabled(true);
+
+            toggleEnableButtons(View.GONE);
+            btUpdate.setVisibility(View.VISIBLE);
+
             toggleEnableEditTexts(true);
             etID.setEnabled(false);
 
         }else if(!etID.isEnabled() && !id.equals("") && updating && !name.equals("") && !phone.equals("") && !address.equals("")){
             try {
                 ContentValues contentValues = new ContentValues();
-                contentValues.put("name",name);
-                contentValues.put("phone",phone);
-                contentValues.put("address",address);
-                sqliteDatabase.update("people",contentValues,"id = ?",new String[]{id});
+                contentValues.put(COLLUM_NAME,name);
+                contentValues.put(COLLUM_PHONE,phone);
+                contentValues.put(COLLUM_ADDRESS,address);
+                sqliteDatabase.update(TABLENAME, contentValues, "id = ?", new String[]{id});
 
                 toggleEnableEditTexts(false);
-                toggleEnableButtons(true);
+                toggleEnableButtons(View.VISIBLE);
                 read(null, null);
                 llPrevNext.setVisibility(View.VISIBLE);
                 updating = false;
@@ -278,6 +302,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Erro ao atualizar registros", Toast.LENGTH_SHORT).show();
                 Log.e(TAG,"Erro ao atualizar registro: "+e.getMessage());
             }
+
+        }else{
+            Toast.makeText(MainActivity.this, "Todos os campos devem ser preenchidos", Toast.LENGTH_SHORT).show();
 
         }
 
@@ -302,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     try {
-                        sqliteDatabase.delete("people","id = ?",new String[]{id});
+                        sqliteDatabase.delete(TABLENAME,"id = ?",new String[]{id});
                         read(null,null);
                     } catch (SQLException e) {
                         Toast.makeText(MainActivity.this, "Erro ao excluir registro", Toast.LENGTH_SHORT).show();
@@ -378,11 +405,17 @@ public class MainActivity extends AppCompatActivity {
         etAddress.setEnabled(enabled);
     }
 
-    private void toggleEnableButtons(boolean enabled){
-        btCreate.setEnabled(enabled);
-        btRead.setEnabled(enabled);
-        btUpdate.setEnabled(enabled);
-        btDelete.setEnabled(enabled);
+    private void toggleEnableButtons(int visibility){
+        btCreate.setVisibility(visibility);
+        btRead.setVisibility(visibility);
+        btUpdate.setVisibility(visibility);
+        btDelete.setVisibility(visibility);
+
+        if(visibility == View.GONE){
+            btCancel.setVisibility(View.VISIBLE);
+        }else{
+            btCancel.setVisibility(View.GONE);
+        }
     }
 
     private void clear(){
@@ -393,25 +426,4 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }
