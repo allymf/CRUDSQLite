@@ -18,8 +18,12 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "CRUDSQLite";
+
+    // Database
     SQLiteDatabase sqliteDatabase = null;
     Cursor cursor;
+
     final String DATABASENAME = "CRUD";
 
     final String TABLENAME = "people";
@@ -29,14 +33,16 @@ public class MainActivity extends AppCompatActivity {
     final String COLLUM_PHONE = "phone";
     final String COLLUM_ADDRESS = "address";
 
-    private static final String TAG = "CRUDSQLite";
+    String id, name, phone, address;
 
+    //Widgets
     LinearLayout llPrevNext;
     EditText etID,etName,etPhone,etAddress;
     Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext,btCancel;
 
-    String id, name, phone, address;
 
+
+    // Flags
     boolean creating = false;
     boolean reading = false;
     boolean updating = false;
@@ -46,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Instatiation of widgets
         llPrevNext = (LinearLayout) findViewById(R.id.llPrevNext);
 
         etID      = (EditText) findViewById(R.id.etID);
@@ -61,8 +68,11 @@ public class MainActivity extends AppCompatActivity {
         btDelete   = (Button) findViewById(R.id.btDelete);
         btCancel   = (Button) findViewById(R.id.btCancel);
 
+        // Request focus to the etName
         etName.requestFocus();
 
+
+        //Button listeners
 
         btPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,22 +101,28 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(!reading){
-                    llPrevNext.setVisibility(View.GONE);
+                    // Makes only the Read and Cancel Button Visible
                     toggleEnableButtons(View.GONE);
                     btRead.setVisibility(View.VISIBLE);
 
+                    // Makes only the etName enabled
                     toggleEnableEditTexts(false);
                     etName.setEnabled(true);
+                    etName.requestFocus();
+
+                    // Clear all edittext
                     clear();
 
+                    // Sets the flag
                     reading=true;
                 }else {
                     name = etName.getText().toString();
                     String search = "name LIKE ?";
-                    read(search,new String[]{"%"+name+"%"});
+                    read(search, new String[]{"%" + name + "%"});
+                    llPrevNext.setVisibility(View.VISIBLE);
+                    //toggleEnableButtons(View.VISIBLE);
 
-                    toggleEnableButtons(View.VISIBLE);
-
+                    // Resets the flag
                     reading = false;
                 }
 
@@ -132,15 +148,24 @@ public class MainActivity extends AppCompatActivity {
         btCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Sets all Flags to false
                 creating = false;
                 reading = false;
                 updating = false;
 
+                // Resets the text of new button
+                btCreate.setText(getString(R.string.btCreate));
+
+                // Make all other buttons visible again
                 toggleEnableButtons(View.VISIBLE);
 
+                // Calls the default search
                 read(null,null);
+                toggleEnableButtons(View.VISIBLE);
+
             }
         });
+
 
         openOrCreateDatabase();
 
@@ -161,12 +186,12 @@ public class MainActivity extends AppCompatActivity {
     private void openOrCreateDatabase(){
         try{
             sqliteDatabase = openOrCreateDatabase(DATABASENAME,MODE_PRIVATE,null);
-            String sql = "CREATE TABLE IF NOT EXISTS people " +
-                        "( id INTEGER PRIMARY KEY," +
-                        "name TEXT,phone TEXT, " +
-                        "address TEXT);";
+            String sql = "CREATE TABLE IF NOT EXISTS "+TABLENAME+" " +
+                        "( "+COLLUM_ID+" INTEGER PRIMARY KEY," +
+                        COLLUM_NAME+" TEXT,"+COLLUM_PHONE+" TEXT, " +
+                        COLLUM_ADDRESS+" TEXT);";
             sqliteDatabase.execSQL(sql);
-            read(null,null);
+            read(null, null);
 
         }catch(SQLException e){
             Toast.makeText(MainActivity.this,"Erro com banco de dados",Toast.LENGTH_LONG).show();
@@ -176,19 +201,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void create(){
 
-        name = etName.getText().toString();
-        phone = etPhone.getText().toString();
-        address = etAddress.getText().toString();
+        getValues();
 
-        llPrevNext.setVisibility(View.GONE);
+        //llPrevNext.setVisibility(View.GONE);
 
         if(!creating) {
 
-            if(!name.equals("") || !phone.equals("") || !address.equals("")) {
-                clear();
-            }else{
-                etID.setText("");
-            }
+            clear();
 
             toggleEnableEditTexts(true);
             etID.setEnabled(false);
@@ -226,8 +245,8 @@ public class MainActivity extends AppCompatActivity {
 
             }else{
                 Toast.makeText(MainActivity.this, "Prencha todos os campos", Toast.LENGTH_SHORT).show();
-                creating = false;
-                read(null,null);
+                //creating = false;
+                //read(null,null);
             }
 
 
@@ -236,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean read(@Nullable String selection,@Nullable String[] selectionArgs){
-        etID.setEnabled(false);
+        //etID.setEnabled(false);
 
         try{
             cursor = sqliteDatabase.query(TABLENAME, null,selection,selectionArgs,null,null,null,null);
@@ -251,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
                     btPrevious.setEnabled(false);
                 }
                 displayData();
-                llPrevNext.setVisibility(View.VISIBLE);
+                //lPrevNext.setVisibility(View.VISIBLE);
                 return true;
             }else{
                 Toast.makeText(MainActivity.this, "Nenhum registro semelhante", Toast.LENGTH_SHORT).show();
@@ -268,15 +287,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     private boolean update(){
-        final String id = etID.getText().toString();
-        name = etName.getText().toString();
-        phone = etPhone.getText().toString();
-        address = etAddress.getText().toString();
+        getValues();
 
         if(!etID.isEnabled() && !id.equals("") && !updating){
             updating = true;
 
-            llPrevNext.setVisibility(View.GONE);
+            //llPrevNext.setVisibility(View.GONE);
 
             toggleEnableButtons(View.GONE);
             btUpdate.setVisibility(View.VISIBLE);
@@ -289,13 +305,13 @@ public class MainActivity extends AppCompatActivity {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(COLLUM_NAME,name);
                 contentValues.put(COLLUM_PHONE,phone);
-                contentValues.put(COLLUM_ADDRESS,address);
+                contentValues.put(COLLUM_ADDRESS, address);
                 sqliteDatabase.update(TABLENAME, contentValues, "id = ?", new String[]{id});
 
                 toggleEnableEditTexts(false);
                 toggleEnableButtons(View.VISIBLE);
                 read(null, null);
-                llPrevNext.setVisibility(View.VISIBLE);
+                //llPrevNext.setVisibility(View.VISIBLE);
                 updating = false;
 
             }catch (SQLException e){
@@ -311,7 +327,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private boolean delete(){
+    private void delete(){
         final String id = etID.getText().toString();
         if(!etID.isEnabled() && !id.equals("")){
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -329,8 +345,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     try {
-                        sqliteDatabase.delete(TABLENAME,"id = ?",new String[]{id});
-                        read(null,null);
+                        sqliteDatabase.delete(TABLENAME, "id = ?", new String[]{id});
+                        read(null, null);
                     } catch (SQLException e) {
                         Toast.makeText(MainActivity.this, "Erro ao excluir registro", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Erro ao excluir do banco: " + e.getMessage());
@@ -344,8 +360,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Operação Proibida", Toast.LENGTH_SHORT).show();
         }
 
-
-        return true;
     }
 
 
@@ -369,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 if(!cursor.isLast()) {
                     cursor.moveToNext();
                     btNext.setEnabled(!cursor.isLast());
-                    btPrevious.setEnabled(true);
+                    btPrevious.setEnabled(!cursor.isFirst());
                     displayData();
                 }
 
@@ -398,6 +412,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void getValues(){
+        id = etID.getText().toString();
+        name = etName.getText().toString();
+        phone = etPhone.getText().toString();
+        address = etAddress.getText().toString();
+
+    }
+
     private void toggleEnableEditTexts(boolean enabled){
         etID.setEnabled(enabled);
         etName.setEnabled(enabled);
@@ -406,6 +428,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void toggleEnableButtons(int visibility){
+        llPrevNext.setVisibility(visibility);
+
         btCreate.setVisibility(visibility);
         btRead.setVisibility(visibility);
         btUpdate.setVisibility(visibility);
