@@ -186,8 +186,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             sqliteDatabase.close();
         }catch (SQLException e){
-            Toast.makeText(MainActivity.this, "Erro ao fechar o banco", Toast.LENGTH_SHORT).show();
-            Log.e(TAG,"Erro ao fechar banco: "+e.getMessage());
+            Toast.makeText(MainActivity.this, getString(R.string.ttDestroy), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, getString(R.string.ttDestroy)+": "+e.getMessage());
         }
 
     }
@@ -213,8 +213,8 @@ public class MainActivity extends AppCompatActivity {
             read(null, null);
 
         }catch(SQLException e){
-            Toast.makeText(MainActivity.this,"Erro com banco de dados",Toast.LENGTH_LONG).show();
-            Log.e(TAG,"Excecao no banco: "+e.getMessage());
+            Toast.makeText(MainActivity.this, getString(R.string.ttOpenCreate), Toast.LENGTH_LONG).show();
+            Log.e(TAG,getString(R.string.ttOpenCreate)+": "+e.getMessage());
         }
     }
 
@@ -274,12 +274,12 @@ public class MainActivity extends AppCompatActivity {
                     isCreating = false;
 
                 }catch (SQLException e){
-                    Toast.makeText(MainActivity.this, "Erro ao inserir no banco", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG,"Erro ao inserir banco: "+e.getMessage());
+                    Toast.makeText(MainActivity.this, getString(R.string.ttCreate), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, getString(R.string.ttCreate)+": "+e.getMessage());
                 }
 
             }else{
-                Toast.makeText(MainActivity.this, "Prencha todos os campos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.ttFillF), Toast.LENGTH_SHORT).show();
             }
 
 
@@ -322,13 +322,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             }else{
-                Toast.makeText(MainActivity.this, "Nenhum registro semelhante", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.ttRead), Toast.LENGTH_SHORT).show();
                 return false;
             }
 
         }catch(SQLException e){
-            Toast.makeText(MainActivity.this, "Erro ao pesquisar no banco", Toast.LENGTH_SHORT).show();
-            Log.e(TAG,"Erro ao pesquisar o banco: "+e.getMessage());
+            Toast.makeText(MainActivity.this, getString(R.string.ttRead2), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, getString(R.string.ttRead2)+": "+e.getMessage());
             return false;
         }
 
@@ -377,12 +377,12 @@ public class MainActivity extends AppCompatActivity {
                 isUpdating = false;
 
             }catch (SQLException e){
-                Toast.makeText(MainActivity.this, "Erro ao atualizar registros", Toast.LENGTH_SHORT).show();
-                Log.e(TAG,"Erro ao atualizar registro: "+e.getMessage());
+                Toast.makeText(MainActivity.this, getString(R.string.ttUpdate), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, getString(R.string.ttUpdate)+": "+e.getMessage());
             }
 
         }else{
-            Toast.makeText(MainActivity.this, "Todos os campos devem ser preenchidos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getString(R.string.ttFillF), Toast.LENGTH_SHORT).show();
 
         }
 
@@ -420,8 +420,8 @@ public class MainActivity extends AppCompatActivity {
                         // calls the default search
                         read(null, null);
                     } catch (SQLException e) {
-                        Toast.makeText(MainActivity.this, "Erro ao excluir registro", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Erro ao excluir do banco: " + e.getMessage());
+                        Toast.makeText(MainActivity.this, getString(R.string.ttDelete), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, getString(R.string.ttDelete)+": " + e.getMessage());
                     }
                 }
             });
@@ -430,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.create().show();
 
         }else{
-            Toast.makeText(MainActivity.this, "Operação Proibida", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getString(R.string.ttDelete2), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -451,8 +451,8 @@ public class MainActivity extends AppCompatActivity {
             displayData();
 
         }catch (SQLException e){
-            Toast.makeText(MainActivity.this, "Não foi possivel mostrar o anterior", Toast.LENGTH_SHORT).show();
-            Log.e(TAG,"Erro ao regressar no cursor: "+e.getMessage());
+            Toast.makeText(MainActivity.this, getString(R.string.ttPrevR), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, getString(R.string.ttPrevR)+": "+e.getMessage());
         }
     }
 
@@ -470,8 +470,8 @@ public class MainActivity extends AppCompatActivity {
             displayData();
 
         }catch (SQLException e){
-            Toast.makeText(MainActivity.this, "Não foi possivel mostrar o próximo", Toast.LENGTH_SHORT).show();
-            Log.e(TAG,"Erro ao avancar no cursor: "+e.getMessage());
+            Toast.makeText(MainActivity.this, getString(R.string.ttNextR), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, getString(R.string.ttNextR)+": "+e.getMessage());
         }
     }
 
@@ -491,8 +491,8 @@ public class MainActivity extends AppCompatActivity {
             toggleEnableEditText(false);
 
         }catch (SQLException e){
-            Toast.makeText(MainActivity.this, "Erro ao mostrar dados", Toast.LENGTH_SHORT).show();
-            Log.e(TAG,"Erro ao mostrar dados: "+e.getMessage());
+            Toast.makeText(MainActivity.this, getString(R.string.ttDisplayD), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, getString(R.string.ttDisplayD)+": "+e.getMessage());
         }
     }
 

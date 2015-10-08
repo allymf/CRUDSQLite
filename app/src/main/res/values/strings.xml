@@ -28,7 +28,18 @@
             <string name="adbtYes">Yes</string>
     
         <!-- Toast -->
-            
+            <string name="ttDestroy">Error while closing Database</string>
+            <string name="ttOpenCreate">Error while creating/opening Database</string>
+            <string name="ttCreate">Error while inserting into Database</string>
+            <string name="ttFillF">Please fill all fields</string>
+            <string name="ttRead">No record matches</string>
+            <string name="ttRead2">Error while searching through Database</string>
+            <string name="ttUpdate">Error while updating records</string>
+            <string name="ttDelete">Error while deleting record</string>
+            <string name="ttDelete2">Forbidden operation</string>
+            <string name="ttPrevR">Unable to show previous record</string>
+            <string name="ttNextR">Unable to show next record</string>
+            <string name="ttDisplayD">Error while displaying data</string>
     
     <string name="action_settings">Settings</string>
 </resources>
