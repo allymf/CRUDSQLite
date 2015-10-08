@@ -20,6 +20,15 @@
 
             <string name="btSave">Save</string>
             <string name="btCancel">Cancel</string>
+
+        <!-- AlertDialog -->
+            <string name="adTitle">Warning!</string>
+            <string name="adMessage">Are you sure, you want to delete the entry with name&#160;</string>
+            <string name="adbtNo">No</string>
+            <string name="adbtYes">Yes</string>
+    
+        <!-- Toast -->
+            
     
     <string name="action_settings">Settings</string>
 </resources>

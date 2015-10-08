@@ -3,6 +3,7 @@ package br.alysson.crudsqlite;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.database.SQLException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -35,27 +36,27 @@ public class MainActivity extends AppCompatActivity {
 
     String id, name, phone, address;
 
-    //Widgets
+    // Widgets
     LinearLayout llPrevNext;
-    EditText etID,etName,etPhone,etAddress;
+    EditText etId,etName,etPhone,etAddress;
     Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext,btCancel;
 
 
 
     // Flags
-    boolean creating = false;
-    boolean reading = false;
-    boolean updating = false;
+    boolean isCreating = false;
+    boolean isSearching = false;
+    boolean isUpdating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Instatiation of widgets
+        // Instatiation of widgets
         llPrevNext = (LinearLayout) findViewById(R.id.llPrevNext);
 
-        etID      = (EditText) findViewById(R.id.etID);
+        etId      = (EditText) findViewById(R.id.etID);
         etName    = (EditText) findViewById(R.id.etName);
         etPhone   = (EditText) findViewById(R.id.etPhone);
         etAddress = (EditText) findViewById(R.id.etAddress);
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         etName.requestFocus();
 
 
-        //Button listeners
+        // Button listeners
 
         btPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,30 +101,37 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(!reading){
+                if(!isSearching){
+
                     // Makes only the Read and Cancel Button Visible
                     toggleEnableButtons(View.GONE);
                     btRead.setVisibility(View.VISIBLE);
 
                     // Makes only the etName enabled
-                    toggleEnableEditTexts(false);
+                    toggleEnableEditText(false);
                     etName.setEnabled(true);
                     etName.requestFocus();
 
-                    // Clear all edittext
+                    // Clear all fields
                     clear();
 
-                    // Sets the flag
-                    reading=true;
+                    // Sets the flag to true
+                    isSearching=true;
                 }else {
+                    // Gets the value
                     name = etName.getText().toString();
+
+                    // Formats the selection string
                     String search = "name LIKE ?";
+
+                    // calls the search function with the values
                     read(search, new String[]{"%" + name + "%"});
+
+                    // Set as visible the Next and Previous Buttons
                     llPrevNext.setVisibility(View.VISIBLE);
-                    //toggleEnableButtons(View.VISIBLE);
 
                     // Resets the flag
-                    reading = false;
+                    isSearching = false;
                 }
 
 
@@ -149,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Sets all Flags to false
-                creating = false;
-                reading = false;
-                updating = false;
+                isCreating = false;
+                isSearching = false;
+                isUpdating = false;
 
                 // Resets the text of new button
                 btCreate.setText(getString(R.string.btCreate));
@@ -161,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // Calls the default search
                 read(null,null);
-                toggleEnableButtons(View.VISIBLE);
 
             }
         });
@@ -174,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // Closes database on activity destruction
         try {
             sqliteDatabase.close();
         }catch (SQLException e){
@@ -183,14 +192,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
     private void openOrCreateDatabase(){
         try{
+            // Creates the database or opens if it already exists
             sqliteDatabase = openOrCreateDatabase(DATABASENAME,MODE_PRIVATE,null);
+
+            // Create the table people if it doesn't exists
             String sql = "CREATE TABLE IF NOT EXISTS "+TABLENAME+" " +
                         "( "+COLLUM_ID+" INTEGER PRIMARY KEY," +
                         COLLUM_NAME+" TEXT,"+COLLUM_PHONE+" TEXT, " +
                         COLLUM_ADDRESS+" TEXT);";
             sqliteDatabase.execSQL(sql);
+
+            // Calls default search
             read(null, null);
 
         }catch(SQLException e){
@@ -201,42 +220,58 @@ public class MainActivity extends AppCompatActivity {
 
     private void create(){
 
+        // Gets the values of the EditText Widgets
         getValues();
 
-        //llPrevNext.setVisibility(View.GONE);
+        if(!isCreating) {
 
-        if(!creating) {
-
+            // Clear all fields
             clear();
 
-            toggleEnableEditTexts(true);
-            etID.setEnabled(false);
+            // Enables all fields but etId
+            toggleEnableEditText(true);
+            etId.setEnabled(false);
+
+            // Request focus to the etName
             etName.requestFocus();
 
+            // Hides all buttons but btCreate
             toggleEnableButtons(View.GONE);
             btCreate.setVisibility(View.VISIBLE);
+
+            // Sets the Button text to Save
             btCreate.setText(getString(R.string.btSave));
 
-            creating = true;
+            // Sets Flag to true
+            isCreating = true;
         }else{
-            // Create Code Here
+
             if(!name.equals("") && !phone.equals("") && !address.equals("")) {
                 try {
 
+                    // Creates the object to carry the insertion values
                     ContentValues contentValues = new ContentValues();
                     contentValues.put(COLLUM_NAME,name);
                     contentValues.put(COLLUM_PHONE,phone);
                     contentValues.put(COLLUM_ADDRESS,address);
+
+                    // Executes the query
                     sqliteDatabase.insert(TABLENAME,null,contentValues);
 
+                    // Clear all fields
                     clear();
+
+                    // Show all buttons again
                     toggleEnableButtons(View.VISIBLE);
+
+                    // Resets the text of the button
                     btCreate.setText(getString(R.string.btCreate));
 
+                    // Calls default search
                     read(null,null);
-                    creating = false;
 
-
+                    // Resets flag
+                    isCreating = false;
 
                 }catch (SQLException e){
                     Toast.makeText(MainActivity.this, "Erro ao inserir no banco", Toast.LENGTH_SHORT).show();
@@ -245,8 +280,6 @@ public class MainActivity extends AppCompatActivity {
 
             }else{
                 Toast.makeText(MainActivity.this, "Prencha todos os campos", Toast.LENGTH_SHORT).show();
-                //creating = false;
-                //read(null,null);
             }
 
 
@@ -255,23 +288,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean read(@Nullable String selection,@Nullable String[] selectionArgs){
-        //etID.setEnabled(false);
 
         try{
+            // Run the querry with the values passed to the function
             cursor = sqliteDatabase.query(TABLENAME, null,selection,selectionArgs,null,null,null,null);
+
+            // If they're null, the query will be like SELECT * FROM people
+
+            // If there is any result
             if(cursor.getCount()>0){
-                if(creating){
+                if(isCreating){
+                    // Moves to the record the was just created
                     cursor.moveToLast();
+
+                    // Disables the next button
+                    // Enables the previous button if the record isn't the first
                     btNext.setEnabled(false);
                     btPrevious.setEnabled(!cursor.isFirst());
                 }else{
+
+                    // Moves to first record
                     cursor.moveToFirst();
+
+                    // Disables the previous button
+                    // Enables the next button if the record isn't the last
                     btNext.setEnabled(!cursor.isLast());
                     btPrevious.setEnabled(false);
                 }
+
+                // Displays the data in the fields
                 displayData();
-                //lPrevNext.setVisibility(View.VISIBLE);
+
                 return true;
+
             }else{
                 Toast.makeText(MainActivity.this, "Nenhum registro semelhante", Toast.LENGTH_SHORT).show();
                 return false;
@@ -287,32 +336,45 @@ public class MainActivity extends AppCompatActivity {
 
 
     private boolean update(){
+
+        // Gets the values of the EditText Widgets
         getValues();
 
-        if(!etID.isEnabled() && !id.equals("") && !updating){
-            updating = true;
+        if(!etId.isEnabled() && !id.equals("") && !isUpdating){
 
-            //llPrevNext.setVisibility(View.GONE);
-
+            // Hide all buttons but btUpdate
             toggleEnableButtons(View.GONE);
             btUpdate.setVisibility(View.VISIBLE);
 
-            toggleEnableEditTexts(true);
-            etID.setEnabled(false);
+            // Enabled all EditText Widgets but etId
+            toggleEnableEditText(true);
+            etId.setEnabled(false);
 
-        }else if(!etID.isEnabled() && !id.equals("") && updating && !name.equals("") && !phone.equals("") && !address.equals("")){
+            // Sets the flag to true
+            isUpdating = true;
+        }else if(!etId.isEnabled() && !id.equals("") && isUpdating && !name.equals("") && !phone.equals("") && !address.equals("")){
             try {
+
+                // Creates the object to carry the insertion values
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(COLLUM_NAME,name);
                 contentValues.put(COLLUM_PHONE,phone);
                 contentValues.put(COLLUM_ADDRESS, address);
+
+                // Executes the update querry
                 sqliteDatabase.update(TABLENAME, contentValues, "id = ?", new String[]{id});
 
-                toggleEnableEditTexts(false);
+                // Disables all Fields
+                toggleEnableEditText(false);
+
+                // Show all Buttons
                 toggleEnableButtons(View.VISIBLE);
+
+                // Calls default search
                 read(null, null);
-                //llPrevNext.setVisibility(View.VISIBLE);
-                updating = false;
+
+                // Resets flag
+                isUpdating = false;
 
             }catch (SQLException e){
                 Toast.makeText(MainActivity.this, "Erro ao atualizar registros", Toast.LENGTH_SHORT).show();
@@ -328,24 +390,34 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void delete(){
-        final String id = etID.getText().toString();
-        if(!etID.isEnabled() && !id.equals("")){
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setTitle("Warning!");
-            dialog.setMessage("Are you sure, you want to delete the entry with name " + etName.getText().toString() + "?");
+        // Getting the id
+        final String id = etId.getText().toString();
 
-            dialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        // Making sure that there is a record
+        if(!etId.isEnabled() && !id.equals("")){
+
+            // Creating the AlertDialog to prevent accidental clicks
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle(getString(R.string.adTitle));
+            dialog.setMessage(getString(R.string.adMessage) + etName.getText().toString() + "?");
+
+            // If the no button was clicked it dimisses the dialog
+            dialog.setNegativeButton(getString(R.string.adbtNo), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });
 
-            dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            // If the yes button was clicked
+            dialog.setPositiveButton(getString(R.string.adbtYes), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     try {
+                        // runs the delete querry
                         sqliteDatabase.delete(TABLENAME, "id = ?", new String[]{id});
+
+                        // calls the default search
                         read(null, null);
                     } catch (SQLException e) {
                         Toast.makeText(MainActivity.this, "Erro ao excluir registro", Toast.LENGTH_SHORT).show();
@@ -354,6 +426,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+            // Displays the AlertDialog
             dialog.create().show();
 
         }else{
@@ -366,12 +439,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void previousResult(){
         try{
-            if(!cursor.isFirst()) {
-                cursor.moveToPrevious();
-                btPrevious.setEnabled(!cursor.isFirst());
-                btNext.setEnabled(!cursor.isLast());
-                displayData();
-            }
+            // Move to previous record
+            cursor.moveToPrevious();
+
+            // Enables or disables the browse button
+            // if there's any record foward or backward
+            btPrevious.setEnabled(!cursor.isFirst());
+            btNext.setEnabled(!cursor.isLast());
+
+            // Displays content in the fields
+            displayData();
+
         }catch (SQLException e){
             Toast.makeText(MainActivity.this, "Não foi possivel mostrar o anterior", Toast.LENGTH_SHORT).show();
             Log.e(TAG,"Erro ao regressar no cursor: "+e.getMessage());
@@ -380,12 +458,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void nextResult(){
         try{
-                if(!cursor.isLast()) {
-                    cursor.moveToNext();
-                    btNext.setEnabled(!cursor.isLast());
-                    btPrevious.setEnabled(!cursor.isFirst());
-                    displayData();
-                }
+            // Move to next record
+            cursor.moveToNext();
+
+            // Enables or disables the browse button
+            // if there's any record foward or backward
+            btNext.setEnabled(!cursor.isLast());
+            btPrevious.setEnabled(!cursor.isFirst());
+
+            // Displays content in the fields
+            displayData();
 
         }catch (SQLException e){
             Toast.makeText(MainActivity.this, "Não foi possivel mostrar o próximo", Toast.LENGTH_SHORT).show();
@@ -399,13 +481,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayData(){
         try {
-            etID.setText(cursor.getString(0));
+            // Setting the content of the fields with their proper values
+            etId.setText(cursor.getString(0));
             etName.setText(cursor.getString(1));
             etPhone.setText(cursor.getString(2));
             etAddress.setText(cursor.getString(3));
 
+            // Disables all fields
+            toggleEnableEditText(false);
 
-            toggleEnableEditTexts(false);
         }catch (SQLException e){
             Toast.makeText(MainActivity.this, "Erro ao mostrar dados", Toast.LENGTH_SHORT).show();
             Log.e(TAG,"Erro ao mostrar dados: "+e.getMessage());
@@ -413,21 +497,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getValues(){
-        id = etID.getText().toString();
+        // Gets all EditText values
+        id = etId.getText().toString();
         name = etName.getText().toString();
         phone = etPhone.getText().toString();
         address = etAddress.getText().toString();
 
     }
 
-    private void toggleEnableEditTexts(boolean enabled){
-        etID.setEnabled(enabled);
+    private void toggleEnableEditText(boolean enabled){
+        // Enables or disables the EditText Widgets
+        // based on the enabled variable
+        etId.setEnabled(enabled);
         etName.setEnabled(enabled);
         etPhone.setEnabled(enabled);
         etAddress.setEnabled(enabled);
     }
 
     private void toggleEnableButtons(int visibility){
+        // Sets the visibility of all buttons and
+        // of the LinearLayout that carries
+        // Next and previous buttton
+
         llPrevNext.setVisibility(visibility);
 
         btCreate.setVisibility(visibility);
@@ -435,15 +526,19 @@ public class MainActivity extends AppCompatActivity {
         btUpdate.setVisibility(visibility);
         btDelete.setVisibility(visibility);
 
+        // if all button were hidden
         if(visibility == View.GONE){
+            // it shows the cancel button
             btCancel.setVisibility(View.VISIBLE);
         }else{
+            // Otherwise it hides it
             btCancel.setVisibility(View.GONE);
         }
     }
 
     private void clear(){
-        etID.setText("");
+        // Clear all fields
+        etId.setText("");
         etName.setText("");
         etPhone.setText("");
         etAddress.setText("");

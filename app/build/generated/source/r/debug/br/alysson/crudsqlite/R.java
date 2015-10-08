@@ -1737,20 +1737,24 @@ containing a value of this type.
         public static final int abc_shareactionprovider_share_with_application=0x7f06000f;
         public static final int abc_toolbar_collapse_description=0x7f060010;
         public static final int action_settings=0x7f060012;
-        public static final int app_name=0x7f060013;
-        public static final int btCancel=0x7f060014;
-        public static final int btCreate=0x7f060015;
-        public static final int btDelete=0x7f060016;
-        public static final int btNext=0x7f060017;
-        public static final int btPrevious=0x7f060018;
-        public static final int btRead=0x7f060019;
-        public static final int btSave=0x7f06001a;
-        public static final int btUpdate=0x7f06001b;
+        public static final int adMessage=0x7f060013;
+        public static final int adTitle=0x7f060014;
+        public static final int adbtNo=0x7f060015;
+        public static final int adbtYes=0x7f060016;
+        public static final int app_name=0x7f060017;
+        public static final int btCancel=0x7f060018;
+        public static final int btCreate=0x7f060019;
+        public static final int btDelete=0x7f06001a;
+        public static final int btNext=0x7f06001b;
+        public static final int btPrevious=0x7f06001c;
+        public static final int btRead=0x7f06001d;
+        public static final int btSave=0x7f06001e;
+        public static final int btUpdate=0x7f06001f;
         public static final int status_bar_notification_info_overflow=0x7f060011;
-        public static final int tvAddress=0x7f06001c;
-        public static final int tvID=0x7f06001d;
-        public static final int tvName=0x7f06001e;
-        public static final int tvPhone=0x7f06001f;
+        public static final int tvAddress=0x7f060020;
+        public static final int tvID=0x7f060021;
+        public static final int tvName=0x7f060022;
+        public static final int tvPhone=0x7f060023;
     }
     public static final class style {
         public static final int AlertDialog_AppCompat=0x7f08007a;

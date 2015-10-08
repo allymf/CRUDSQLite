@@ -211,6 +211,10 @@
     <!-- From: file:/C:/Users/Alysson/Desktop/CRUDSQLite/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_settings">Settings</string>
+    <string name="adMessage">Are you sure, you want to delete the entry with name </string>
+    <string name="adTitle">Warning!</string>
+    <string name="adbtNo">No</string>
+    <string name="adbtYes">Yes</string>
     <string name="app_name">CRUDSQLite</string>
     <string name="btCancel">Cancel</string>
     <string name="btCreate">New</string>
