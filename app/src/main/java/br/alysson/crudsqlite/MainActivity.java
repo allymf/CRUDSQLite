@@ -175,8 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 isSearching = false;
                 isUpdating = false;
 
-                // Resets the text of new button
-                btCreate.setText(getString(R.string.btCreate));
+                
 
                 btSave.setVisibility(View.GONE);
 
@@ -239,8 +238,7 @@ public class MainActivity extends AppCompatActivity {
         toggleEnableButtons(View.GONE);
         //btCreate.setVisibility(View.VISIBLE);
 
-        // Sets the Button text to Save
-       // btCreate.setText(getString(R.string.btSave));
+
         btSave.setVisibility(View.VISIBLE);
 
         // Sets Flag to true
@@ -270,8 +268,6 @@ public class MainActivity extends AppCompatActivity {
                     // Show all buttons again
                     toggleEnableButtons(View.VISIBLE);
 
-                    // Resets the text of the button
-                    btCreate.setText(getString(R.string.btCreate));
 
                     // Calls default search
                     search(null);
