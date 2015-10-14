@@ -17,6 +17,8 @@ import android.database.Cursor;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "CRUDSQLite";
@@ -36,10 +38,14 @@ public class MainActivity extends AppCompatActivity {
 
     String id, name, phone, address;
 
+    List<Person> people;
+    private int peopleCount;
+    PersonDao personDao;
+
     // Widgets
     LinearLayout llPrevNext;
     EditText etId,etName,etPhone,etAddress;
-    Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext,btCancel;
+    Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext,btSave,btCancel;
 
 
 
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         btRead     = (Button) findViewById(R.id.btRead);
         btUpdate   = (Button) findViewById(R.id.btUpdate);
         btDelete   = (Button) findViewById(R.id.btDelete);
+        btSave     = (Button) findViewById(R.id.btSave);
         btCancel   = (Button) findViewById(R.id.btCancel);
 
         // Request focus to the etName
@@ -93,7 +100,17 @@ public class MainActivity extends AppCompatActivity {
         btCreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                newP();
+            }
+        });
+
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 create();
+                if(!isCreating) {
+                    btSave.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -121,11 +138,8 @@ public class MainActivity extends AppCompatActivity {
                     // Gets the value
                     name = etName.getText().toString();
 
-                    // Formats the selection string
-                    String search = "name LIKE ?";
-
                     // calls the search function with the values
-                    read(search, new String[]{"%" + name + "%"});
+                    search(name);
 
                     // Set as visible the Next and Previous Buttons
                     llPrevNext.setVisibility(View.VISIBLE);
@@ -164,17 +178,29 @@ public class MainActivity extends AppCompatActivity {
                 // Resets the text of new button
                 btCreate.setText(getString(R.string.btCreate));
 
+                btSave.setVisibility(View.GONE);
+
                 // Make all other buttons visible again
                 toggleEnableButtons(View.VISIBLE);
 
                 // Calls the default search
-                read(null,null);
+                search(null);
 
             }
         });
 
 
-        openOrCreateDatabase();
+        try{
+            personDao = new PersonDao(MainActivity.this);
+            personDao.open();
+            search(null);
+
+        }catch(SQLException e){
+            Toast.makeText(MainActivity.this, getString(R.string.ttOpenCreate), Toast.LENGTH_LONG).show();
+            Log.e(TAG,getString(R.string.ttOpenCreate)+": "+e.getMessage());
+        }
+
+        //openOrCreateDatabase();
 
     }
 
@@ -184,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Closes database on activity destruction
         try {
-            sqliteDatabase.close();
+            personDao.close();
         }catch (SQLException e){
             Toast.makeText(MainActivity.this, getString(R.string.ttDestroy), Toast.LENGTH_SHORT).show();
             Log.e(TAG, getString(R.string.ttDestroy)+": "+e.getMessage());
@@ -197,25 +223,28 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
     }
 
-    private void openOrCreateDatabase(){
-        try{
-            // Creates the database or opens if it already exists
-            sqliteDatabase = openOrCreateDatabase(DATABASENAME,MODE_PRIVATE,null);
 
-            // Create the table people if it doesn't exists
-            String sql = "CREATE TABLE IF NOT EXISTS "+TABLENAME+" " +
-                        "( "+COLLUM_ID+" INTEGER PRIMARY KEY," +
-                        COLLUM_NAME+" TEXT,"+COLLUM_PHONE+" TEXT, " +
-                        COLLUM_ADDRESS+" TEXT);";
-            sqliteDatabase.execSQL(sql);
+    private void newP(){
+        // Clear all fields
+        clear();
 
-            // Calls default search
-            read(null, null);
+        // Enables all fields but etId
+        toggleEnableEditText(true);
+        etId.setEnabled(false);
 
-        }catch(SQLException e){
-            Toast.makeText(MainActivity.this, getString(R.string.ttOpenCreate), Toast.LENGTH_LONG).show();
-            Log.e(TAG,getString(R.string.ttOpenCreate)+": "+e.getMessage());
-        }
+        // Request focus to the etName
+        etName.requestFocus();
+
+        // Hides all buttons but btCreate
+        toggleEnableButtons(View.GONE);
+        //btCreate.setVisibility(View.VISIBLE);
+
+        // Sets the Button text to Save
+       // btCreate.setText(getString(R.string.btSave));
+        btSave.setVisibility(View.VISIBLE);
+
+        // Sets Flag to true
+        isCreating = true;
     }
 
     private void create(){
@@ -223,40 +252,17 @@ public class MainActivity extends AppCompatActivity {
         // Gets the values of the EditText Widgets
         getValues();
 
-        if(!isCreating) {
-
-            // Clear all fields
-            clear();
-
-            // Enables all fields but etId
-            toggleEnableEditText(true);
-            etId.setEnabled(false);
-
-            // Request focus to the etName
-            etName.requestFocus();
-
-            // Hides all buttons but btCreate
-            toggleEnableButtons(View.GONE);
-            btCreate.setVisibility(View.VISIBLE);
-
-            // Sets the Button text to Save
-            btCreate.setText(getString(R.string.btSave));
-
-            // Sets Flag to true
-            isCreating = true;
-        }else{
-
             if(!name.equals("") && !phone.equals("") && !address.equals("")) {
                 try {
 
-                    // Creates the object to carry the insertion values
-                    ContentValues contentValues = new ContentValues();
-                    contentValues.put(COLLUM_NAME,name);
-                    contentValues.put(COLLUM_PHONE,phone);
-                    contentValues.put(COLLUM_ADDRESS,address);
+                    Person person = new Person();
+
+                    person.setName(name);
+                    person.setPhone(phone);
+                    person.setAddress(address);
 
                     // Executes the query
-                    sqliteDatabase.insert(TABLENAME,null,contentValues);
+                    personDao.create(person);
 
                     // Clear all fields
                     clear();
@@ -268,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                     btCreate.setText(getString(R.string.btCreate));
 
                     // Calls default search
-                    read(null,null);
+                    search(null);
 
                     // Resets flag
                     isCreating = false;
@@ -285,39 +291,45 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-    }
 
-    private boolean read(@Nullable String selection,@Nullable String[] selectionArgs){
+
+    private boolean search(String name){
 
         try{
-            // Run the querry with the values passed to the function
-            cursor = sqliteDatabase.query(TABLENAME, null,selection,selectionArgs,null,null,null,null);
+            // Runs the querry with the values passed to the function
+            Person person = new Person();
+            person.setName(name);
+            people = personDao.read(person);
 
             // If they're null, the query will be like SELECT * FROM people
 
             // If there is any result
-            if(cursor.getCount()>0){
+            if(people.size()>0){
                 if(isCreating){
-                    // Moves to the record the was just created
-                    cursor.moveToLast();
+                    // Moves to the record that was just created
+                    peopleCount = people.size()-1;
+
+                    boolean isFirst = (peopleCount == 0);
 
                     // Disables the next button
                     // Enables the previous button if the record isn't the first
                     btNext.setEnabled(false);
-                    btPrevious.setEnabled(!cursor.isFirst());
+                    btPrevious.setEnabled(!isFirst);
                 }else{
 
                     // Moves to first record
-                    cursor.moveToFirst();
+                    peopleCount = 0;
+
+                    boolean isLast = (peopleCount+1 == people.size());
 
                     // Disables the previous button
                     // Enables the next button if the record isn't the last
-                    btNext.setEnabled(!cursor.isLast());
+                    btNext.setEnabled(!isLast);
                     btPrevious.setEnabled(false);
                 }
 
                 // Displays the data in the fields
-                displayData();
+                displayData(peopleCount);
 
                 return true;
 
@@ -355,14 +367,14 @@ public class MainActivity extends AppCompatActivity {
         }else if(!etId.isEnabled() && !id.equals("") && isUpdating && !name.equals("") && !phone.equals("") && !address.equals("")){
             try {
 
-                // Creates the object to carry the insertion values
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(COLLUM_NAME,name);
-                contentValues.put(COLLUM_PHONE,phone);
-                contentValues.put(COLLUM_ADDRESS, address);
+                Person person = new Person();
+                person.setId(Long.valueOf(id));
+                person.setName(name);
+                person.setPhone(phone);
+                person.setAddress(address);
 
                 // Executes the update querry
-                sqliteDatabase.update(TABLENAME, contentValues, "id = ?", new String[]{id});
+                personDao.update(person);
 
                 // Disables all Fields
                 toggleEnableEditText(false);
@@ -371,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 toggleEnableButtons(View.VISIBLE);
 
                 // Calls default search
-                read(null, null);
+                search(null);
 
                 // Resets flag
                 isUpdating = false;
@@ -391,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void delete(){
         // Getting the id
-        final String id = etId.getText().toString();
+
 
         // Making sure that there is a record
         if(!etId.isEnabled() && !id.equals("")){
@@ -414,11 +426,13 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     try {
+                        Person person = new Person();
+                        person.setId(Long.valueOf(etId.getText().toString()));
                         // runs the delete querry
-                        sqliteDatabase.delete(TABLENAME, "id = ?", new String[]{id});
+                        personDao.delete(person);
 
                         // calls the default search
-                        read(null, null);
+                        search(null);
                     } catch (SQLException e) {
                         Toast.makeText(MainActivity.this, getString(R.string.ttDelete), Toast.LENGTH_SHORT).show();
                         Log.e(TAG, getString(R.string.ttDelete)+": " + e.getMessage());
@@ -440,15 +454,19 @@ public class MainActivity extends AppCompatActivity {
     private void previousResult(){
         try{
             // Move to previous record
-            cursor.moveToPrevious();
+            //cursor.moveToPrevious();
+            peopleCount--;
+
+            boolean isFirst = (peopleCount == 0);
+            boolean isLast = (peopleCount+1 == people.size());
 
             // Enables or disables the browse button
             // if there's any record foward or backward
-            btPrevious.setEnabled(!cursor.isFirst());
-            btNext.setEnabled(!cursor.isLast());
+            btPrevious.setEnabled(!isFirst);
+            btNext.setEnabled(!isLast);
 
             // Displays content in the fields
-            displayData();
+            displayData(peopleCount);
 
         }catch (SQLException e){
             Toast.makeText(MainActivity.this, getString(R.string.ttPrevR), Toast.LENGTH_SHORT).show();
@@ -459,15 +477,19 @@ public class MainActivity extends AppCompatActivity {
     private void nextResult(){
         try{
             // Move to next record
-            cursor.moveToNext();
+            //cursor.moveToNext();
+            peopleCount++;
+
+            boolean isFirst = (peopleCount == 0);
+            boolean isLast = (peopleCount+1 == people.size());
 
             // Enables or disables the browse button
             // if there's any record foward or backward
-            btNext.setEnabled(!cursor.isLast());
-            btPrevious.setEnabled(!cursor.isFirst());
+            btNext.setEnabled(!isLast);
+            btPrevious.setEnabled(!isFirst);
 
             // Displays content in the fields
-            displayData();
+            displayData(peopleCount);
 
         }catch (SQLException e){
             Toast.makeText(MainActivity.this, getString(R.string.ttNextR), Toast.LENGTH_SHORT).show();
@@ -479,18 +501,18 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void displayData(){
+    private void displayData(int index){
         try {
             // Setting the content of the fields with their proper values
-            etId.setText(cursor.getString(0));
-            etName.setText(cursor.getString(1));
-            etPhone.setText(cursor.getString(2));
-            etAddress.setText(cursor.getString(3));
+            etId.setText(String.valueOf(people.get(index).getId()));
+            etName.setText(people.get(index).getName());
+            etPhone.setText(people.get(index).getPhone());
+            etAddress.setText(people.get(index).getAddress());
 
             // Disables all fields
             toggleEnableEditText(false);
 
-        }catch (SQLException e){
+        }catch (ArrayIndexOutOfBoundsException e){
             Toast.makeText(MainActivity.this, getString(R.string.ttDisplayD), Toast.LENGTH_SHORT).show();
             Log.e(TAG, getString(R.string.ttDisplayD)+": "+e.getMessage());
         }

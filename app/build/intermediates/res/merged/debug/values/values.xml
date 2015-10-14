@@ -229,6 +229,18 @@
     <string name="status_bar_notification_info_overflow">999+</string>
     <!-- From: file:/C:/Users/Alysson/Desktop/CRUDSQLite/app/src/main/res/values/strings.xml -->
     <eat-comment/>
+    <string name="ttCreate">Error while inserting into Database</string>
+    <string name="ttDelete">Error while deleting record</string>
+    <string name="ttDelete2">Forbidden operation</string>
+    <string name="ttDestroy">Error while closing Database</string>
+    <string name="ttDisplayD">Error while displaying data</string>
+    <string name="ttFillF">Please fill all fields</string>
+    <string name="ttNextR">Unable to show next record</string>
+    <string name="ttOpenCreate">Error while creating/opening Database</string>
+    <string name="ttPrevR">Unable to show previous record</string>
+    <string name="ttRead">No record matches</string>
+    <string name="ttRead2">Error while searching through Database</string>
+    <string name="ttUpdate">Error while updating records</string>
     <string name="tvAddress">Address:</string>
     <string name="tvID">ID:</string>
     <string name="tvName">Name:</string>

@@ -109,6 +109,14 @@
             />
 
         <Button
+            android:id="@+id/btSave"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btSave"
+            />
+
+        <Button
             android:id="@+id/btCancel"
             android:visibility="gone"
             android:layout_width="wrap_content"
