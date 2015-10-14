@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                     search(name);
 
                     // Set as visible the Next and Previous Buttons
-                    llPrevNext.setVisibility(View.VISIBLE);
+                    //llPrevNext.setVisibility(View.VISIBLE);
 
                     // Resets the flag
                     isSearching = false;
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 isSearching = false;
                 isUpdating = false;
 
-                
+
 
                 btSave.setVisibility(View.GONE);
 
@@ -326,6 +326,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // Displays the data in the fields
                 displayData(peopleCount);
+
+                llPrevNext.setVisibility(View.VISIBLE);
 
                 return true;
 
