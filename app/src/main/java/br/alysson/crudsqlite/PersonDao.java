@@ -40,30 +40,29 @@ public class PersonDao {
 
        long bct = sqliteDatabase.insert(SQLiteHelper.TABLE_NAME, null, contentValues);
 
-        Log.d(TAG,"BCT: "+bct);
+        Log.d(TAG, "BCT: " + bct);
     }
 
     public List<Person> read(Person person) throws SQLException{
 
         String where = null, whereArg[] = null;
-        Log.d(TAG,"BCT: "+person.getName());
         if(person.getName()!=null){
             where = SQLiteHelper.COLLUM_NAME+" LIKE ?";
             whereArg = new String[]{"%"+person.getName()+"%"};
         }
 
-        Cursor cursor = sqliteDatabase.query(SQLiteHelper.TABLE_NAME, null, where, whereArg, null, null, null);
+        Cursor cursor = sqliteDatabase.query(SQLiteHelper.TABLE_NAME, null,
+                where, whereArg, null, null, null);
 
         //Cursor cursor = sqliteDatabase.rawQuery("select * from people",null);
         List<Person> people = new ArrayList<>();
 
-        Log.d(TAG,"BCT: "+cursor.getCount());
 
-        if(cursor.getCount()>0) {
-            cursor.moveToFirst();
-            do{
+        if(cursor.moveToFirst() && cursor.getCount()>0) {
+
+            while(!cursor.isAfterLast()){
                 Person p = new Person();
-                p.setId(Long.valueOf(cursor.getString(0)));
+                p.setId((long) cursor.getInt(0));
                 p.setName(cursor.getString(1));
                 p.setPhone(cursor.getString(2));
                 p.setAddress(cursor.getString(3));
@@ -71,9 +70,10 @@ public class PersonDao {
                 people.add(p);
 
                 cursor.moveToNext();
-            }while (!cursor.isLast());
+            }
         }
 
+        cursor.close();
         return people;
 
     }

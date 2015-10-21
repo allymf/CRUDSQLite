@@ -23,18 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "CRUDSQLite";
 
-    // Database
-    SQLiteDatabase sqliteDatabase = null;
-    Cursor cursor;
-
-    final String DATABASENAME = "CRUD";
-
-    final String TABLENAME = "people";
-
-    final String COLLUM_ID = "id";
-    final String COLLUM_NAME = "name";
-    final String COLLUM_PHONE = "phone";
-    final String COLLUM_ADDRESS = "address";
 
     String id, name, phone, address;
 
