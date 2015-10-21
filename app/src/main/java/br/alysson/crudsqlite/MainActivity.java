@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         // Request focus to the etName
         etName.requestFocus();
 
+        toggleEnableEditText(false);
 
         // Button listeners
 
@@ -392,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Making sure that there is a record
-        if(!etId.isEnabled() && !id.equals("")){
+        if(!etId.isEnabled() && !etId.getText().toString().equals("")){
 
             // Creating the AlertDialog to prevent accidental clicks
             AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -416,6 +417,8 @@ public class MainActivity extends AppCompatActivity {
                         person.setId(Long.valueOf(etId.getText().toString()));
                         // runs the delete querry
                         personDao.delete(person);
+
+                        clear();
 
                         // calls the default search
                         search(null);
