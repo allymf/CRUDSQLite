@@ -3,6 +3,16 @@
 
     <!-- MainActivity -->
 
+        <!-- Toolbar -->
+            <string name="tbNew">Create new record</string>
+            <string name="tbSearch">Search for a record</string>
+            <string name="tbUpdate">Edit the current record</string>
+
+        <!-- FABS -->
+            <string name="fabSearch">Search Records</string>
+            <string name="fabDelete">Delete Current Record</string>
+
+
         <!-- TextView -->
             <string name="tvID">ID:</string>
             <string name="tvName">Name:</string>
@@ -23,7 +33,7 @@
 
         <!-- AlertDialog -->
             <string name="adTitle">Warning!</string>
-            <string name="adMessage">Are you sure, you want to delete the entry with name&#160;</string>
+            <string name="adMessage">Are you sure, you want to delete the current record with name&#160;</string>
             <string name="adbtNo">No</string>
             <string name="adbtYes">Yes</string>
     

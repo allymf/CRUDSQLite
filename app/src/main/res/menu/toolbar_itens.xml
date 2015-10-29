@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/save"
+        android:icon="@mipmap/save"
+        android:title="@string/btSave"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/delete"
+        android:icon="@mipmap/delete"
+        android:title="@string/btDelete"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/search"
+        android:icon="@mipmap/magnify"
+        android:title="@string/btSave"
+        app:showAsAction="always"/>
+
+
+
+
+
+</menu>

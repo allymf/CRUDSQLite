@@ -1,5 +1,6 @@
 package br.alysson.crudsqlite;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -8,18 +9,24 @@ import android.database.SQLException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.Cursor;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private static final String TAG = "CRUDSQLite";
 
@@ -31,9 +38,16 @@ public class MainActivity extends AppCompatActivity {
     PersonDao personDao;
 
     // Widgets
+    Toolbar toolbar;
     LinearLayout llPrevNext;
     EditText etId,etName,etPhone,etAddress;
-    Button btCreate,btRead,btUpdate,btDelete,btPrevious,btNext,btSave,btCancel;
+    Button btPrevious,btNext;
+    FloatingActionMenu fab;
+    FloatingActionButton fab1,fab2,fab3;
+
+    private Menu menu;
+    private MenuItem searchItem, saveItem;
+
 
 
 
@@ -41,13 +55,22 @@ public class MainActivity extends AppCompatActivity {
     boolean isCreating = false;
     boolean isSearching = false;
     boolean isUpdating = false;
+    boolean isOnSearch = false;
+    boolean thereIsRecords = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // Instatiation of widgets
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        fab = (FloatingActionMenu) findViewById(R.id.fab);
+        fab1 = (FloatingActionButton) findViewById(R.id.fab1);
+        fab2 = (FloatingActionButton) findViewById(R.id.fab2);
+        fab3 = (FloatingActionButton) findViewById(R.id.fab3);
+
         llPrevNext = (LinearLayout) findViewById(R.id.llPrevNext);
 
         etId      = (EditText) findViewById(R.id.etID);
@@ -57,19 +80,31 @@ public class MainActivity extends AppCompatActivity {
 
         btPrevious = (Button) findViewById(R.id.btPrevious);
         btNext     = (Button) findViewById(R.id.btNext);
-        btCreate   = (Button) findViewById(R.id.btCreate);
-        btRead     = (Button) findViewById(R.id.btRead);
-        btUpdate   = (Button) findViewById(R.id.btUpdate);
-        btDelete   = (Button) findViewById(R.id.btDelete);
-        btSave     = (Button) findViewById(R.id.btSave);
-        btCancel   = (Button) findViewById(R.id.btCancel);
+
 
         // Request focus to the etName
-        etName.requestFocus();
+        //etName.requestFocus();
+
+        toolbar.setTitle(getString(R.string.app_name));
+        setSupportActionBar(toolbar);
+
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel();
+            }
+        });
+
+
 
         toggleEnableEditText(false);
 
-        // Button listeners
+        // Button listeners;
+
+        fab1.setOnClickListener(this);
+        fab2.setOnClickListener(this);
+        fab3.setOnClickListener(this);
 
         btPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,96 +121,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        btCreate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                newP();
-            }
-        });
-
-        btSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                create();
-                if(!isCreating) {
-                    btSave.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        btRead.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(!isSearching){
-
-                    // Makes only the Read and Cancel Button Visible
-                    toggleEnableButtons(View.GONE);
-                    btRead.setVisibility(View.VISIBLE);
-
-                    // Makes only the etName enabled
-                    toggleEnableEditText(false);
-                    etName.setEnabled(true);
-                    etName.requestFocus();
-
-                    // Clear all fields
-                    clear();
-
-                    // Sets the flag to true
-                    isSearching=true;
-                }else {
-                    // Gets the value
-                    name = etName.getText().toString();
-
-                    // calls the search function with the values
-                    search(name);
-
-                    // Set as visible the Next and Previous Buttons
-                    //llPrevNext.setVisibility(View.VISIBLE);
-
-                    // Resets the flag
-                    isSearching = false;
-                }
 
 
-                }
-        });
-
-        btUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                update();
-            }
-        });
-
-        btDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                delete();
-            }
-        });
-
-
-        btCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Sets all Flags to false
-                isCreating = false;
-                isSearching = false;
-                isUpdating = false;
-
-
-
-                btSave.setVisibility(View.GONE);
-
-                // Make all other buttons visible again
-                toggleEnableButtons(View.VISIBLE);
-
-                // Calls the default search
-                search(null);
-
-            }
-        });
 
 
         try{
@@ -188,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG,getString(R.string.ttOpenCreate)+": "+e.getMessage());
         }
 
-        //openOrCreateDatabase();
 
     }
 
@@ -212,6 +158,158 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.toolbar_itens, menu);
+
+        // Hide action items, you don't want to display
+        menu.findItem(R.id.search).setVisible(false);
+        menu.findItem(R.id.save).setVisible(false);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.save).setVisible((isCreating || isUpdating));
+        menu.findItem(R.id.search).setVisible(isSearching || isOnSearch);
+
+        menu.findItem(R.id.delete).setVisible((!isCreating && !isUpdating && !isSearching && thereIsRecords || isOnSearch && thereIsRecords));
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.save) {
+            if (isCreating) {
+                create();
+                invalidateOptionsMenu();
+            }else if(isUpdating){
+                update();
+                invalidateOptionsMenu();
+            }
+            return true;
+        }
+
+        if(item.getItemId() == R.id.search){
+            actionSearch();
+            isOnSearch = !isOnSearch;
+            invalidateOptionsMenu();
+            return true;
+        }
+
+        if(item.getItemId() == R.id.delete){
+            delete();
+            return true;
+        }
+
+
+        return false;
+    }
+
+    @Override
+    public void onClick(View v){
+
+        switch(v.getId()){
+
+            case R.id.fab1:
+                fab.hideMenuButton(true);
+                toolbar.setTitle((getString(R.string.tbNew)));
+                newP();
+                invalidateOptionsMenu();
+                cancelActionToggle(true);
+                break;
+
+            case R.id.fab2:
+                fab.hideMenuButton(true);
+                toolbar.setTitle((getString(R.string.tbSearch)));
+                actionSearch();
+                invalidateOptionsMenu();
+                cancelActionToggle(true);
+                break;
+
+            case  R.id.fab3:
+                fab.hideMenuButton(true);
+                toolbar.setTitle((getString(R.string.tbUpdate)));
+                update();
+                invalidateOptionsMenu();
+                cancelActionToggle(true);
+                break;
+
+
+        }
+
+    }
+
+
+    public void cancelActionToggle(boolean enable){
+        if(enable) {
+            toolbar.setNavigationIcon(R.mipmap.clear);
+        }else{
+            toolbar.setNavigationIcon(null);
+        }
+    }
+
+    public void cancel(){
+        // Sets all Flags to false
+        isCreating = false;
+        isSearching = false;
+        isUpdating = false;
+        isOnSearch = false;
+
+        invalidateOptionsMenu();
+
+        fab.showMenuButton(true);
+
+        toggleEnableEditText(false);
+
+        toolbar.setNavigationIcon(null);
+        toolbar.setTitle(getString(R.string.app_name));
+
+        // Make all other buttons visible again
+        llPrevNext.setVisibility(View.VISIBLE);
+
+        // Calls the default search
+        search(null);
+    }
+
+    public void actionSearch(){
+        if(!isSearching){
+
+            // Makes only the Read and Cancel Button Visible
+            llPrevNext.setVisibility(View.GONE);
+
+            // Makes only the etName enabled
+            toggleEnableEditText(false);
+            etName.setEnabled(true);
+            etName.requestFocus();
+
+            // Clear all fields
+            clear();
+
+            // Sets the flag to true
+            isSearching=true;
+        }else {
+            // Gets the value
+            name = etName.getText().toString();
+
+            // calls the search function with the values
+            search(name);
+
+            invalidateOptionsMenu();
+
+            // Set as visible the Next and Previous Buttons
+            //llPrevNext.setVisibility(View.VISIBLE);
+
+            // Resets the flag
+            isSearching = false;
+        }
+    }
+
+
     private void newP(){
         // Clear all fields
         clear();
@@ -224,11 +322,10 @@ public class MainActivity extends AppCompatActivity {
         etName.requestFocus();
 
         // Hides all buttons but btCreate
-        toggleEnableButtons(View.GONE);
+        llPrevNext.setVisibility(View.GONE);
         //btCreate.setVisibility(View.VISIBLE);
 
 
-        btSave.setVisibility(View.VISIBLE);
 
         // Sets Flag to true
         isCreating = true;
@@ -255,11 +352,15 @@ public class MainActivity extends AppCompatActivity {
                     clear();
 
                     // Show all buttons again
-                    toggleEnableButtons(View.VISIBLE);
+                    llPrevNext.setVisibility(View.VISIBLE);
 
 
                     // Calls default search
                     search(null);
+
+                    fab.showMenuButton(true);
+                    toolbar.setTitle(getString(R.string.app_name));
+                    cancelActionToggle(false);
 
                     // Resets flag
                     isCreating = false;
@@ -290,11 +391,13 @@ public class MainActivity extends AppCompatActivity {
 
             // If there is any result
             if(people.size()>0){
+                thereIsRecords = true;
                 if(isCreating){
                     // Moves to the record that was just created
                     peopleCount = people.size()-1;
 
                     boolean isFirst = (peopleCount == 0);
+
 
                     // Disables the next button
                     // Enables the previous button if the record isn't the first
@@ -316,11 +419,18 @@ public class MainActivity extends AppCompatActivity {
                 // Displays the data in the fields
                 displayData(peopleCount);
 
+                //cancelActionToggle(false);
+
+
+
                 llPrevNext.setVisibility(View.VISIBLE);
 
                 return true;
 
             }else{
+                thereIsRecords = false;
+                llPrevNext.setVisibility(View.GONE);
+
                 Toast.makeText(MainActivity.this, getString(R.string.ttRead), Toast.LENGTH_SHORT).show();
                 return false;
             }
@@ -342,8 +452,7 @@ public class MainActivity extends AppCompatActivity {
         if(!etId.isEnabled() && !id.equals("") && !isUpdating){
 
             // Hide all buttons but btUpdate
-            toggleEnableButtons(View.GONE);
-            btUpdate.setVisibility(View.VISIBLE);
+            llPrevNext.setVisibility(View.GONE);
 
             // Enabled all EditText Widgets but etId
             toggleEnableEditText(true);
@@ -367,10 +476,14 @@ public class MainActivity extends AppCompatActivity {
                 toggleEnableEditText(false);
 
                 // Show all Buttons
-                toggleEnableButtons(View.VISIBLE);
+                llPrevNext.setVisibility(View.VISIBLE);
 
                 // Calls default search
                 search(null);
+
+                fab.showMenuButton(true);
+                toolbar.setTitle(getString(R.string.app_name));
+                cancelActionToggle(false);
 
                 // Resets flag
                 isUpdating = false;
@@ -404,6 +517,7 @@ public class MainActivity extends AppCompatActivity {
             dialog.setNegativeButton(getString(R.string.adbtNo), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    fab.showMenuButton(true);
                     dialog.dismiss();
                 }
             });
@@ -419,6 +533,8 @@ public class MainActivity extends AppCompatActivity {
                         personDao.delete(person);
 
                         clear();
+
+                        fab.showMenuButton(true);
 
                         // calls the default search
                         search(null);
@@ -523,28 +639,6 @@ public class MainActivity extends AppCompatActivity {
         etName.setEnabled(enabled);
         etPhone.setEnabled(enabled);
         etAddress.setEnabled(enabled);
-    }
-
-    private void toggleEnableButtons(int visibility){
-        // Sets the visibility of all buttons and
-        // of the LinearLayout that carries
-        // Next and previous buttton
-
-        llPrevNext.setVisibility(visibility);
-
-        btCreate.setVisibility(visibility);
-        btRead.setVisibility(visibility);
-        btUpdate.setVisibility(visibility);
-        btDelete.setVisibility(visibility);
-
-        // if all button were hidden
-        if(visibility == View.GONE){
-            // it shows the cancel button
-            btCancel.setVisibility(View.VISIBLE);
-        }else{
-            // Otherwise it hides it
-            btCancel.setVisibility(View.GONE);
-        }
     }
 
     private void clear(){

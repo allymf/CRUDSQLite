@@ -15,8 +15,9 @@ ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidMani
 		INJECTED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml
 application
 ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:5:5-20:19
-MERGED from [com.android.support:appcompat-v7:23.0.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.0.0\AndroidManifest.xml:22:5-20
-MERGED from [com.android.support:support-v4:23.0.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:appcompat-v7:23.1.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.0\AndroidManifest.xml:22:5-20
+MERGED from [com.android.support:support-v4:23.1.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\AndroidManifest.xml:22:5-20
+MERGED from [com.github.clans:fab:1.6.1] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.github.clans\fab\1.6.1\AndroidManifest.xml:12:5-20
 	android:label
 		ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:8:9-41
 	android:allowBackup
@@ -24,7 +25,7 @@ MERGED from [com.android.support:support-v4:23.0.0] C:\Users\Alysson\Desktop\pro
 	android:icon
 		ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:7:9-43
 	android:theme
-		ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:9:9-40
+		ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:9:9-45
 activity#br.alysson.crudsqlite.MainActivity
 ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:10:9-19:20
 	android:label
@@ -45,8 +46,9 @@ ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidMani
 		ADDED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml:17:27-74
 uses-sdk
 INJECTED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
-MERGED from [com.android.support:appcompat-v7:23.0.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.0.0\AndroidManifest.xml:20:5-43
-MERGED from [com.android.support:support-v4:23.0.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.0.0\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:appcompat-v7:23.1.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.1.0\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-v4:23.1.0] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.1.0\AndroidManifest.xml:20:5-43
+MERGED from [com.github.clans:fab:1.6.1] C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\build\intermediates\exploded-aar\com.github.clans\fab\1.6.1\AndroidManifest.xml:8:5-10:41
 	android:targetSdkVersion
 		INJECTED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml
 		INJECTED from C:\Users\Alysson\Desktop\projects\CRUDSQLite\app\src\main\AndroidManifest.xml
